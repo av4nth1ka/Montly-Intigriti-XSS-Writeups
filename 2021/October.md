@@ -1,8 +1,8 @@
 # October XSS Challenge 2021
 
-Link: https://challenge-1021.intigriti.io/
-Description: Find a way to execute arbitrary javascript on this page and win Intigriti swag.
-Author: @0xTib3rius: https://twitter.com/0xTib3rius
+Link: https://challenge-1021.intigriti.io/ <br>
+Description: Find a way to execute arbitrary javascript on this page and win Intigriti swag.<br>
+Author: @0xTib3rius: https://twitter.com/0xTib3rius <br>
 
 # Analysis
 + Looking at the source code we can see that it is getting redirected to `challenge/challenge.php`
