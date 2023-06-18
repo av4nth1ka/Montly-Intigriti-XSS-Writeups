@@ -81,3 +81,8 @@ The result will be as above, but we need the quote in the front so as to execute
  'Giving the above payload, 
 ![image](https://github.com/Avanthikaanand/Intigriti-XSS-challenges/assets/80388135/6481eec2-6d73-4dd9-b7b3-4094841ef930)
 Hence solved!!
+                                                                          
+## Reference:
++ https://content-security-policy.com/
++ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src
+                                                                         
