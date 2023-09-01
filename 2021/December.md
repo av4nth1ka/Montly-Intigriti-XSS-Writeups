@@ -1,7 +1,7 @@
 link: https://challenge-1221.intigriti.io/challenge/index.php?payload=
 Author: https://twitter.com/E1u5iv3F0x
 
-+ In the payload field, when I first gave <h1>test</h1>
++ In the payload field, when I first gave `<h1>test</h1>`
 ![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/02224fbb-8518-4b9d-b447-7252845cac79)
 + When I submitted the same payload for the second time,
 ![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/b36187ef-853c-40a6-96ed-1de0c72c2099)
