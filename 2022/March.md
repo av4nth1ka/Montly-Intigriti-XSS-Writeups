@@ -48,3 +48,7 @@ PHPSESSID cookie has to be present and the value can be any string of at least 1
 + Important: `Furthermore, the PHPSESSID cookie was set without the SameSite attribute. This means that modern browsers such as Chrome and FireFox would implement a 2-minute buffer window before setting this attribute as SameSite=Lax.`
 + Once a valid PHPSESSID cookie is obtained, we have 2 minutes before the SameSite=Lax setting kicks in, preventing cross-site POST requests from sending cookies. Now we have to quickly send our POST request to trigger the XSS payload. The HTML file above automatically sends this POST request after a 5-second delay (to ensure that the new cookie from the opened tab is processed). When the request is sent successfully, the XSS should trigger in the victim’s context.
 
+Reference:
++ https://stackoverflow.com/questions/59990864/what-is-the-difference-between-samesite-lax-and-samesite-strict
++ https://infosecwriteups.com/the-buffer-curse-3591efb4a724
++ https://www.php.net/manual/en/function.header.php
