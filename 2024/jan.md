@@ -1,4 +1,4 @@
-+ dom clobbering in search parameter.insert another <form id=”search”> above the form that’s in the challenge page. However, this would only allow me to hijack the searches, and that wouldn’t get me an XSS.
++ dom clobbering in search parameter.insert another `<form id=”search”> `above the form that’s in the challenge page. However, this would only allow me to hijack the searches, and that wouldn’t get me an XSS.
 
 + prototype pollution in axios library
 payload: https://challenge-0124.intigriti.io/challenge?search=con&name=%3Cform+id%3Dsearch%3E%3Cinput+name%3D%22__proto__%5Bintigriti%5D%22+value%3D%22rodriguezjorgex%22%3E
